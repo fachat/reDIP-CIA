@@ -102,11 +102,18 @@ begin
                         t1_latch(7 downto 0) <= data;
                     when ADDR_T1C_H | ADDR_T1L_H =>
                         t1_latch(15 downto 8) <= data;
-                    when ADDR_T2C_L =>
-                        t2l_latch <= data;
                     when others =>
                         null;
                 end case;
+            end if;
+        end if;
+    end process;
+
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            if we = '1' and addr = ADDR_T2C_L then
+                t2l_latch <= data;
             end if;
         end if;
     end process;
@@ -132,7 +139,12 @@ begin
                 t1_count_prev <= t1_count;
                 t1_ufl_prev   <= t1_ufl;
             end if;
+        end if;
+    end process;
 
+    process (clk)
+    begin
+        if rising_edge(clk) then
             if phi2 = '0' then
                 t2_pb6_reg  <= t2_pb6;
                 t2_pb6_prev <= t2_pb6_last;
@@ -210,7 +222,12 @@ begin
             elsif phi2 = '1' and t1_run = '1' and t1_ufl = '1' then
                 t1_pb7_reg <= not t1_pb7_prev;
             end if;
+        end if;
+    end process;
 
+    process (clk)
+    begin
+        if rising_edge(clk) then
             if w_t2c_h = '1' then
                 t2_run <= '1';
             elsif res = '1' or s_t2_prev = '1' then
